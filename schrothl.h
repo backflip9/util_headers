@@ -24,6 +24,18 @@ namespace lls
     return find(container, value) == container.end();
   }
 
+  template<typename T>
+  void sort(T container)
+  {
+    std::sort(container.begin(), container.end());
+  }
+
+  template<typename T, typename BinaryPred>
+  void sort(T container, BinaryPred pred)
+  {
+    std::sort(container.begin(), container.end(), pred);
+  }
+
   template<typename SumPred>
   size_t sum(int begin, int end, SumPred pred)
   {
