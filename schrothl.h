@@ -24,6 +24,21 @@ namespace lls
     return find(container, value) == container.end();
   }
 
+  template<typename TContainer>
+  void printContainer(const TContainer& container, std::ostream& out = std::cout)
+  {
+    out << '{';
+    for (int index = 0; index < container.size(); ++index)
+    {
+      out << container[index];
+      if (index != container.size() - 1)
+      {
+        out << ", ";
+      }
+    }
+    out << "}\n";
+  }
+
   template<typename T>
   void sort(T container)
   {
