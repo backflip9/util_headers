@@ -51,6 +51,12 @@ namespace lls
     std::sort(container.begin(), container.end(), pred);
   }
 
+  template<typename TContainer>
+  TValue sum(TContainer container)
+  {
+    return std::accumulate(container.begin(), container.end(), container::value_type(0));
+  }
+
   template<typename TValue, typename TContainer>
   TValue sum(TContainer container)
   {
