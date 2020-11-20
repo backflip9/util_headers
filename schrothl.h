@@ -17,6 +17,10 @@
 
 #define CONCAT(arg1, arg2) arg1 ## arg2
 
+#define _UNIQUE_COUNTER(base, line) CONCAT(base, line)
+
+#define RANGE(count) for (int _UNIQUE_COUNTER(i, __LINE__) = 0; _UNIQUE_COUNTER(i, __LINE__) < count; ++_UNIQUE_COUNTER(i, __LINE__))
+
 namespace lls
 {
   template<typename TContainer, typename T>
