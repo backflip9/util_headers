@@ -52,15 +52,17 @@ namespace lls
   }
 
   template<typename T>
-  void sort(T& container)
+  T& sort(T& container)
   {
     std::sort(container.begin(), container.end());
+		return container;
   }
 
   template<typename T, typename BinaryPred>
-  void sort(T& container, BinaryPred pred)
+  T& sort(T& container, BinaryPred pred)
   {
     std::sort(container.begin(), container.end(), pred);
+		return container;
   }
 
   template<typename TContainer, typename TValue = typename TContainer::value_type>
