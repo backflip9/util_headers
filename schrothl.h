@@ -70,7 +70,7 @@ namespace lls
   }
 
   template<typename TValue, typename TContainer>
-  TValue sum(TContainer container)
+  TValue sum(const TContainer& container)
   {
     return std::accumulate(container.begin(), container.end(), TValue(0));
   }
@@ -79,7 +79,7 @@ namespace lls
   size_t sum(int begin, int end, SumPred pred)
   {
     size_t accumulator = 0;
-    for(int i = begin; i < end; ++i)
+    for (int i = begin; i < end; ++i)
     {
       pred(accumulator, i);
     }
