@@ -52,19 +52,19 @@ namespace lls
   }
 
   template<typename T>
-  void sort(T container)
+  void sort(T& container)
   {
     std::sort(container.begin(), container.end());
   }
 
   template<typename T, typename BinaryPred>
-  void sort(T container, BinaryPred pred)
+  void sort(T& container, BinaryPred pred)
   {
     std::sort(container.begin(), container.end(), pred);
   }
 
   template<typename TContainer, typename TValue = typename TContainer::value_type>
-  TValue sum(TContainer container)
+  TValue sum(const TContainer& container)
   {
     return std::accumulate(container.begin(), container.end(), TContainer::value_type(0));
   }
