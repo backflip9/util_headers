@@ -1,14 +1,22 @@
-//#include <pair>
+#include <algorithm>
+#include <array>
+#include <cstdint>
+#include <iostream>
+#include <numeric>
+#include <utility>
+
 #ifdef DEBUG
 #define debug if (true) cout
 #else
 #define debug if (false) cout
 #endif
 
-#include <array>
-#include <utility>
-#include <algorithm>
-#include <cstdint>
+#define _TOSTRING(arg) #arg
+
+#define TOSTRING(arg) _TOSTRING(arg)
+
+#define CONCAT(arg1, arg2) arg1 ## arg2
+
 namespace lls
 {
   template<typename TContainer, typename T>
@@ -51,10 +59,10 @@ namespace lls
     std::sort(container.begin(), container.end(), pred);
   }
 
-  template<typename TContainer>
+  template<typename TContainer, typename TValue = typename TContainer::value_type>
   TValue sum(TContainer container)
   {
-    return std::accumulate(container.begin(), container.end(), container::value_type(0));
+    return std::accumulate(container.begin(), container.end(), TContainer::value_type(0));
   }
 
   template<typename TValue, typename TContainer>
@@ -71,7 +79,7 @@ namespace lls
     {
       pred(accumulator, i);
     }
-    return accumulate;
+    return accumulator;
     //return std::accumulate(range.begin(), range.end(), 0L, [a, b, j](const int64_t& current, const size_t& index) -> int64_t
   }
 
