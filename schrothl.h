@@ -4,6 +4,7 @@
 #include <iostream>
 #include <numeric>
 #include <utility>
+#include <memory>
 
 #ifdef DEBUG
 #define debug if (true) cout
@@ -120,4 +121,113 @@ namespace lls
   {
     return static_cast<int>(x + 0.5f);
   }
+
+#if defined(WIN32)
+  template <typename T>
+  class ScopedComPtr
+  {
+    public:
+      template <typename ...Types>
+      ScopedComPtr<T>(Types ...args)
+        : data(new T(args))
+      {
+        data->AddRef();
+      }
+
+      /*
+      ScopedComPtr<T[]>(size_t count)
+        : data(new T[count])
+      {
+      }
+	  */
+
+      T& operator*() const
+      {
+        return *data;
+      }
+
+      T& operator->() const
+      {
+        return *data;
+      }
+
+      ~ScopedComPtr()
+      {
+        // if this sends the refcount back to 0
+        if (data->Release() == 0)
+        {
+          delete data;
+        }
+      }
+      
+    private:
+      T* data;
+  };
+
+  template <typename T, typename ...Types>
+  typename std::enable_if<!std::is_array<T>::value, ScopedComPtr<T>>::type MakeScopedComPtr(Types ...args)
+  {
+      return ScopedComPtr<T>(args);
+  }
+
+  template <typename T>
+  ScopedComPtr<T[]> MakeScopedComPtr(size_t count)
+  {
+    return ScopedComPtr<T[]>(count);
+  }
+#endif
+
+  template<typename T>
+  class LinkedList
+  {
+    private:
+			struct ListNode;
+      typedef std::shared_ptr<ListNode> NodePtr;
+      struct ListNode
+      {
+        ListNode(T input)
+          : data(input)
+          , next()
+        {
+        }
+
+        T data;
+        NodePtr next;
+      };
+    public:
+      LinkedList<T>(T args...)
+      {
+        for (auto arg: {args...})
+        {
+          Insert(arg);
+        }
+      }
+
+      const T& Insert(T value)
+      {
+        if (first.get() == nullptr)
+        {
+          first = value;
+        }
+        else
+        {
+          NodePtr tmp;
+          while (tmp.get() != nullptr) tmp = tmp->next;
+          tmp = value;
+        }
+      }
+
+      void Delete()
+      {
+        if (first.get() != nullptr)
+        {
+          NodePtr tmp;
+          while (tmp->next.get() != nullptr) tmp = tmp.next;
+          tmp->next.reset();
+        }
+      }
+
+    private:
+      NodePtr first;
+  };
 }
