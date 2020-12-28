@@ -66,10 +66,10 @@ namespace lls
 		return container;
   }
 
-  template<typename TContainer, typename TValue = typename TContainer::value_type>
+  template<typename TContainer, typename TValue>
   TValue sum(const TContainer& container)
   {
-    return std::accumulate(container.begin(), container.end(), TContainer::value_type(0));
+    return std::accumulate(container.begin(), container.end(), std::result_of_t<TContainer::operator[]>(0));
   }
 
   template<typename TValue, typename TContainer>
@@ -169,7 +169,7 @@ namespace lls
   };
 
   template <typename T, typename ...Types>
-  typename std::enable_if<!std::is_array<T>::value, ScopedComPtr<T>>::type MakeScopedComPtr(Types ...args)
+  std::enable_if_t<!std::is_array<T>::value, ScopedComPtr<T>> MakeScopedComPtr(Types ...args)
   {
       return ScopedComPtr<T>(args);
   }
