@@ -143,12 +143,12 @@ namespace lls
 
       T& operator*() const
       {
-        return *data;
+        return dereference();
       }
 
       T& operator->() const
       {
-        return *data;
+        return dereference();
       }
 
       ~ScopedComPtr()
@@ -161,6 +161,10 @@ namespace lls
       }
       
     private:
+      T& dereference()
+      {
+        return *data;
+      }
       T* data;
   };
 
