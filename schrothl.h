@@ -5,6 +5,7 @@
 #include <numeric>
 #include <utility>
 #include <memory>
+#include <stdio.h>
 
 #ifdef DEBUG
 #define debug if (true) cout
@@ -233,5 +234,22 @@ namespace lls
 
     private:
       NodePtr first;
+  };
+
+  template <size_t size = 128>
+  class FmtBuffer
+  {
+  public:
+    FmtBuffer(const char* fmt, ...args)
+    {
+      sprintf(m_buf, fmt, args);
+    }
+
+    const char* c_str()
+    {
+      return &m_buf;
+    }
+  private:
+    char m_buf[size];
   };
 }
