@@ -187,7 +187,7 @@ namespace lls
   {
     private:
 			struct ListNode;
-      typedef std::shared_ptr<ListNode> NodePtr;
+      using NodePtr = std::shared_ptr<ListNode>;
       struct ListNode
       {
         ListNode(T input)
