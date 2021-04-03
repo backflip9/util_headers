@@ -252,4 +252,10 @@ namespace lls
   private:
     char m_buf[size];
   };
+
+  template <typename T>
+  void ZeroObject(T* obj)
+  {
+    ZeroMemory(obj, sizeof(T));
+  }
 }
