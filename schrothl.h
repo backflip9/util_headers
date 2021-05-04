@@ -25,6 +25,13 @@
 
 namespace lls
 {
+  template <typename T, typename ...Args>
+	T& Tap(T& container, Args ...unused)
+	{
+		return container;
+	}
+
+
   template<typename TContainer, typename T>
   const T* find(const TContainer& container, const T& value)
   {
@@ -253,9 +260,42 @@ namespace lls
     char m_buf[size];
   };
 
+	template <typename T>
+	void ZeroObject(const T* obj)
+	{
+		std::memset(obj, NULL, sizeof(T));
+	}
+
+#if 0
   template <typename T>
-  void ZeroObject(T* obj)
+  class ScopedPtrBase
   {
-    ZeroMemory(obj, sizeof(T));
+  public:
+    T* get() = 0;
+  };
+
+  template <>
+  class ScopedPtr<IUnknown> : ScopedPtrBase<IUnknown>
+  {
+  public:
+    IUnknown* get()
+    {
+      return data.Get();
+    }
+  private:
+    Microsoft::WRL::ComPtr data;
   }
+
+  template <typename T>
+  class ScopedPtr<T> : ScopedPtrBase<T>
+  {
+  public:
+    T* get()
+    {
+      return data.get();
+    }
+  private:
+    std::unique_ptr<T> data;
+  }
+#endif
 }
