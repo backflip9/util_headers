@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <numeric>
 #include <utility>
@@ -31,22 +32,15 @@ namespace lls
 		return container;
 	}
 
-
   template<typename TContainer, typename T>
-  const T* find(const TContainer& container, const T& value)
+  const T* Find(const TContainer& container, const T& value)
   {
     //return 0;
-    return std::find(container.begin(), container.end(), value);
-  }
-
-  template<typename TContainer, typename T>
-  bool doesNotExist(const TContainer& container, const T& value)
-  {
-    return find(container, value) == container.end();
+    return std::find(std::begin(container), std::end(container), value);
   }
 
   template<typename TContainer>
-  void printContainer(const TContainer& container, std::ostream& out = std::cout)
+  void PrintContainer(const TContainer& container, std::ostream& out = std::cout)
   {
     out << '{';
     for (int index = 0; index < container.size(); ++index)
@@ -61,33 +55,33 @@ namespace lls
   }
 
   template<typename T>
-  T& sort(T& container)
+  T& Sort(T& container)
   {
-    std::sort(container.begin(), container.end());
+    std::sort(std::begin(container), std::end(container));
 		return container;
   }
 
   template<typename T, typename BinaryPred>
-  T& sort(T& container, BinaryPred pred)
+  T& Sort(T& container, BinaryPred pred)
   {
     std::sort(container.begin(), container.end(), pred);
 		return container;
   }
 
   template<typename TContainer, typename TValue>
-  TValue sum(const TContainer& container)
+  TValue Sum(const TContainer& container)
   {
     return std::accumulate(container.begin(), container.end(), std::result_of_t<TContainer::operator[]>(0));
   }
 
   template<typename TValue, typename TContainer>
-  TValue sum(const TContainer& container)
+  TValue Sum(const TContainer& container)
   {
     return std::accumulate(container.begin(), container.end(), TValue(0));
   }
 
   template<typename SumPred>
-  size_t sum(int begin, int end, SumPred pred)
+  size_t Sum(int begin, int end, SumPred pred)
   {
     size_t accumulator = 0;
     for (int i = begin; i < end; ++i)
@@ -99,16 +93,22 @@ namespace lls
   }
 
   template<typename SumPred>
-  size_t sum(int end, SumPred pred)
+  size_t Sum(int end, SumPred pred)
   {
     return sum(0, end, pred);
   }
 
+  template<typename TContainer, typename T>
+  bool DoesNotExist(const TContainer& container, const T& value)
+  {
+    return lls::Find(container, value) == container.end();
+  }
+
 
   template<typename TContainer, typename T>
-  bool exists(const TContainer& container, const T& value)
+  bool Exists(const TContainer& container, const T& value)
   {
-    return doesNotExist(container, value) == false;
+    return DoesNotExist(container, value) == false;
   }
 
   template<typename TKey, typename TValue, uint32_t Size>
@@ -125,7 +125,7 @@ namespace lls
     return itr;
   }
 
-  int round(float x)
+  int Round(float x)
   {
     return static_cast<int>(x + 0.5f);
   }
