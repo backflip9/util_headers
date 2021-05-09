@@ -26,6 +26,37 @@
 
 namespace lls
 {
+    template<typename T>
+    static T Positive(const T& arg)
+    {
+        return +arg;
+    }
+
+    template<typename T>
+    static T Negative(const T& arg)
+    {
+        return -arg;
+    }
+
+
+  template<typename T>
+  static T Plus(const T& arg1, const T& arg2)
+  {
+    return arg1 + arg2;
+  }
+
+  template<typename T>
+  static T Minus(const T& arg1, const T& arg2)
+  {
+    return arg1 - arg2;
+  }
+
+  template<typename T>
+  static T Times(const T& arg1, const T& arg2)
+  {
+    return arg1 * arg2;
+  }
+
   template <typename T, typename ...Args>
 	T& Tap(T& container, Args ...unused)
 	{
