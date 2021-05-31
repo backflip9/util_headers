@@ -33,6 +33,13 @@ namespace lls
     }
 
     template<typename T>
+    static T ClampAbs(const T& value, const T& clampLimit)
+    {
+      static_assert(std::is_floating_point_v<T>, "must be floating point");
+      return std::clamp(value, -clampLimit, clampLimit);
+    }
+
+    template<typename T>
     static T Negative(const T& arg)
     {
         return -arg;
