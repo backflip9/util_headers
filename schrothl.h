@@ -7,6 +7,8 @@
 #include <utility>
 #include <memory>
 #include <stdio.h>
+#include <new>
+#include <assert.h>
 
 #ifdef DEBUG
 #define debug if (true) cout
