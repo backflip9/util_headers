@@ -24,6 +24,8 @@
 
 #define RANGE(count) for (int _UNIQUE_COUNTER(i, __LINE__) = 0; _UNIQUE_COUNTER(i, __LINE__) < count; ++_UNIQUE_COUNTER(i, __LINE__))
 
+#define CUSTOM_OPTIONAL_TEST 0
+
 namespace lls
 {
     template<typename T>
@@ -336,4 +338,196 @@ namespace lls
     std::unique_ptr<T> data;
   }
 #endif
+
+
+   //todo: concept
+
+   struct OffsetInfo
+   {
+      uint32_t numBytes;
+      uint8_t leftShiftBits;
+   };
+
+
+   template <typename Contained>
+   class Optional
+   {
+   public:
+      Optional()
+      {
+         for (size_t i = 0; i < kObjectSizeBytes; ++i)
+         {
+            m_storedValue[i] = 0;
+         }
+      }
+
+      void Emplace()
+      {
+         ::new (m_storedValue) Contained();
+         const OffsetInfo offsetInfo = getOffsetInfo<Contained>();
+         uint8_t& targetByte = m_storedValue[offsetInfo.numBytes];
+         targetByte |= (1 << offsetInfo.leftShiftBits);
+      }
+
+      void Destroy()
+      {
+         Contained* const castedContained = reinterpret_cast<Contained*>(m_storedValue);
+         castedContained->~Contained();
+
+         //could call getOffsetInfo<T>() here again, but it's probably faster to just zero out the whole struct?
+         //if constexpr (kObjectSizeBytes < 100)
+         if (false)
+         {
+            for (size_t i = 0; i < kObjectSizeBytes; ++i)
+            {
+               m_storedValue[i] = 0;
+            }
+         }
+         else
+         {
+            const OffsetInfo offsetInfo = getOffsetInfo<Contained>();
+            uint8_t& targetByte = m_storedValue[offsetInfo.numBytes];
+            uint8_t andParam = ~(1 << offsetInfo.leftShiftBits);
+            targetByte &= andParam;
+         }
+      }
+
+      Contained& GetValue()
+      {
+         assert(HasValue() == true);
+         Contained* const castedContained = reinterpret_cast<Contained*>(m_storedValue);
+         return *castedContained;
+      }
+
+      bool HasValue() const
+      {
+         const OffsetInfo offsetInfo = getOffsetInfo<Contained>();
+
+         assert(offsetInfo.numBytes < kObjectSizeBytes);
+         const uint8_t relevantByte = m_storedValue[offsetInfo.numBytes];
+         if ((relevantByte & (1 << offsetInfo.leftShiftBits)) == 0)
+         {
+            return false;
+         }
+         return true;
+      }
+   private:
+
+      template <typename T>
+      /*consteval*/ static OffsetInfo getOffsetInfo()
+      {
+         int32_t targetByte = -1;
+         constexpr size_t kByteCount = sizeof(T);
+         uint8_t zeroBuffer[kByteCount] = { 0 };
+         T* castedInstance = reinterpret_cast<T*>(zeroBuffer);
+         castedInstance->Optional_markReservedBit();
+         for (uint32_t byteCounter = 0; byteCounter < kByteCount; ++byteCounter)
+         {
+            if (zeroBuffer[byteCounter] > 0)
+            {
+               targetByte = byteCounter;
+               break;
+            }
+         }
+
+         if (targetByte == -1)
+         {
+            assert(false);
+         }
+
+         int16_t leftShiftBits = -1;
+         const uint8_t relevantByte = zeroBuffer[targetByte];
+         for (uint8_t bitCounter = 0; bitCounter < 8; ++bitCounter)
+         {
+            if ((relevantByte & (1 << bitCounter)) > 0)
+            {
+               leftShiftBits = bitCounter;
+               break;
+            }
+         }
+
+         if (leftShiftBits == -1)
+         {
+            assert(false);
+         }
+
+         OffsetInfo result{};
+         result.numBytes = uint32_t(targetByte);
+         result.leftShiftBits = uint8_t(leftShiftBits);
+         return result;
+      }
+
+      constexpr static size_t kObjectSizeBytes = sizeof(Contained);
+      uint8_t m_storedValue[kObjectSizeBytes];
+   };
+
+   class ObjectOptions
+   {
+   public:
+      using Self = ObjectOptions;
+
+      ObjectOptions()
+         : xCoord(0)
+         , yCoord(0)
+         , zCoord(0)
+         , otherOptions()
+         , id(0)
+      {
+      }
+
+      friend Optional<Self>;
+      void Optional_markReservedBit()
+      {
+         otherOptions.optionalReserved = 1;
+      }
+
+      const void* const Optional_GetByteOffset() const
+      {
+         //return offsetof(ObjectOptions, otherOptions);
+         return &otherOptions;
+      }
+   public:
+
+      float xCoord;
+      float yCoord;
+      float zCoord;
+      struct otherOptionsStruct
+      {
+         otherOptionsStruct()
+            : isTransparent(0)
+            , needsReflection(0)
+            , optionalReserved(0)
+            , addToPickBuffer(0)
+         {
+         }
+
+         uint32_t isTransparent : 1;
+         uint32_t needsReflection : 1;
+         uint32_t optionalReserved : 1;
+         uint32_t addToPickBuffer : 1;
+      } otherOptions;
+      int id;
+   };
 }
+
+#if CUSTOM_OPTIONAL_TEST
+int main()
+{
+   lls::ObjectOptions options;
+   options.xCoord = 93;
+   options.yCoord = 94;
+   options.zCoord = 95;
+   options.otherOptions.isTransparent = 0;
+   options.otherOptions.needsReflection = 1;
+   options.otherOptions.optionalReserved = 0;
+   options.otherOptions.addToPickBuffer = 1;
+   options.id = 6432;
+   const void* const memberPtr = options.Optional_GetByteOffset();
+   lls::Optional<lls::ObjectOptions> optInstance = lls::Optional<lls::ObjectOptions>();
+   const bool hasValue = optInstance.HasValue();
+   optInstance.Emplace();
+   const lls::ObjectOptions& containedValue = optInstance.GetValue();
+   optInstance.Destroy();
+   return 0;
+}
+#endif // CUSTOM_OPTIONAL_TEST
