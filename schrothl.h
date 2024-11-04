@@ -363,6 +363,14 @@ namespace lls
          }
       }
 
+      ~Optional()
+      {
+         if (HasValue() == true)
+         {
+            Destroy();
+         }
+      }
+
       void Emplace()
       {
          ::new (m_storedValue) Contained();
